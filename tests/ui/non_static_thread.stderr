@@ -1,0 +1,19 @@
+error[E0373]: closure may outlive the current function, but it borrows `s`, which is owned by the current function
+ --> tests/ui/non_static_thread.rs:5:19
+  |
+5 |     thread::spawn(|| {
+  |                   ^^ may outlive borrowed value `s`
+6 |         println!("{s}");
+  |                    - `s` is borrowed here
+  |
+note: function requires argument type to outlive `'static`
+ --> tests/ui/non_static_thread.rs:5:5
+  |
+5 | /     thread::spawn(|| {
+6 | |         println!("{s}");
+7 | |     });
+  | |______^
+help: to force the closure to take ownership of `s` (and any other referenced variables), use the `move` keyword
+  |
+5 |     thread::spawn(move || {
+  |                   ++++

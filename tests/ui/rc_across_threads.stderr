@@ -1,0 +1,21 @@
+error[E0277]: `Rc<i32>` cannot be sent between threads safely
+ --> tests/ui/rc_across_threads.rs:5:19
+  |
+5 |       thread::spawn(move || {
+  |       ------------- ^------
+  |       |             |
+  |  _____|_____________within this `{closure@$DIR/tests/ui/rc_across_threads.rs:5:19: 5:26}`
+  | |     |
+  | |     required by a bound introduced by this call
+6 | |         let _ = r.clone();
+7 | |     });
+  | |_____^ `Rc<i32>` cannot be sent between threads safely
+  |
+  = help: within `{closure@$DIR/tests/ui/rc_across_threads.rs:5:19: 5:26}`, the trait `Send` is not implemented for `Rc<i32>`
+note: required because it's used within this closure
+ --> tests/ui/rc_across_threads.rs:5:19
+  |
+5 |     thread::spawn(move || {
+  |                   ^^^^^^^
+note: required by a bound in `spawn`
+ --> $RUST/std/src/thread/mod.rs

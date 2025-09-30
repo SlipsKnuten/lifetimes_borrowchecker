@@ -1,0 +1,9 @@
+error[E0502]: cannot borrow `s` as mutable because it is also borrowed as immutable
+ --> tests/ui/overlap.rs:4:13
+  |
+3 |     let r = &s;
+  |             -- immutable borrow occurs here
+4 |     let m = &mut s;
+  |             ^^^^^^ mutable borrow occurs here
+5 |     println!("{r}");
+  |                - immutable borrow later used here

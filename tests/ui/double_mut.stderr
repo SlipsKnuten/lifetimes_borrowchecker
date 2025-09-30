@@ -1,0 +1,9 @@
+error[E0499]: cannot borrow `s` as mutable more than once at a time
+ --> tests/ui/double_mut.rs:4:14
+  |
+3 |     let m1 = &mut s;
+  |              ------ first mutable borrow occurs here
+4 |     let m2 = &mut s;
+  |              ^^^^^^ second mutable borrow occurs here
+5 |     m1.push('!');
+  |     -- first borrow later used here

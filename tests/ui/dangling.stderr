@@ -1,0 +1,5 @@
+error[E0515]: cannot return reference to local variable `s`
+ --> tests/ui/dangling.rs:3:5
+  |
+3 |     &s
+  |     ^^ returns a reference to data owned by the current function

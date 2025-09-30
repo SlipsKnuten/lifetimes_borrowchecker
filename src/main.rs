@@ -54,7 +54,6 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::{fs, path::PathBuf};
 
     #[test]
     fn passing_runtime_tests() {
@@ -71,85 +70,19 @@ mod tests {
         assert_eq!(thread_move_owned_demo(), "moved into thread safely");
     }
 
-    // This test will FAIL at runtime (red in `cargo test`) and demonstrates
-    // a borrow-rule violation enforced by RefCell's runtime checking.
     #[test]
     fn failing_runtime_borrow_violation() {
+        // Demonstrates runtime borrow-rule panic; this test is expected to FAIL.
         let cell = RefCell::new(String::from("boom"));
         let _r = cell.borrow();
-        let _w = cell.borrow_mut(); // panics -> this test FAILS
+        let _w = cell.borrow_mut();
     }
 
     // Compile-fail tests (real borrow-checker/lifetime errors) using trybuild.
-    // We keep everything in main.rs by writing the example sources to temp files first.
+    // Source snippets live under tests/ui with matching .stderr expectations.
     #[test]
     fn compile_fail_lifetime_and_borrow_checker() {
-        let tmp = tempfile::tempdir().unwrap();
-
-        let mut write = |name: &str, src: &str| -> PathBuf {
-            let path = tmp.path().join(name);
-            fs::write(&path, src).unwrap();
-            path
-        };
-
-        // Dangling reference: returning ref to local
-        let p1 = write("dangling.rs", r#"
-            fn bad_ref<'a>() -> &'a str {
-                let s = String::from("temp");
-                &s
-            }
-            fn main() {}
-        "#);
-
-        // Immutable + mutable overlap
-        let p2 = write("overlap.rs", r#"
-            fn main() {
-                let mut s = String::from("hi");
-                let r = &s;
-                let m = &mut s;
-                println!("{r}");
-                m.push('!');
-            }
-        "#);
-
-        // Two mutable borrows at once
-        let p3 = write("double_mut.rs", r#"
-            fn main() {
-                let mut s = String::from("hi");
-                let m1 = &mut s;
-                let m2 = &mut s;
-                m1.push('!');
-                m2.push('?');
-            }
-        "#);
-
-        // Non-'static capture in thread
-        let p4 = write("non_static_thread.rs", r#"
-            use std::thread;
-            fn main() {
-                let s = String::from("outer");
-                thread::spawn(|| {
-                    println!("{}", s);
-                });
-            }
-        "#);
-
-        // Rc across threads (not Send)
-        let p5 = write("rc_across_threads.rs", r#"
-            use std::{rc::Rc, thread};
-            fn main() {
-                let r = Rc::new(5);
-                thread::spawn(move || {
-                    let _ = r.clone();
-                });
-            }
-        "#);
-
         let t = trybuild::TestCases::new();
-        t.compile_fail(p1.to_str().unwrap());
-        t.compile_fail(p2.to_str().unwrap());
-        t.compile_fail(p3.to_str().unwrap());
-        t.compile_fail(p4.to_str().unwrap());
-        t.compile_fail(p5.to_str().unwrap());
+        t.compile_fail("tests/ui/*.rs");
     }
 }
