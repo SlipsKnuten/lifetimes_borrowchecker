@@ -5,3 +5,7 @@ edition = "2024"
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
+
+[dev-dependencies]
+trybuild = "1"
+tempfile = "3"
