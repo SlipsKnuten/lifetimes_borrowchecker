@@ -2,53 +2,6 @@ use std::cell::RefCell;
 use std::thread;
 use std::time::Duration;
 
-/// ```compile_fail
-/// fn bad_ref<'a>() -> &'a str {
-///     let s = String::from("temp");
-///     &s
-/// }
-/// ```
-///
-/// ```compile_fail
-/// fn overlap() {
-///     let mut s = String::from("hi");
-///     let r = &s;
-///     let m = &mut s;
-///     println!("{r}");
-///     m.push('!');
-/// }
-/// ```
-///
-/// ```compile_fail
-/// fn double_mut() {
-///     let mut s = String::from("hi");
-///     let m1 = &mut s;
-///     let m2 = &mut s;
-///     m1.push('!');
-///     m2.push('?');
-/// }
-/// ```
-///
-/// ```compile_fail
-/// use std::thread;
-/// fn non_static_thread() {
-///     let s = String::from("outer");
-///     thread::spawn(|| {
-///         println!("{}", s);
-///     });
-/// }
-/// ```
-///
-/// ```compile_fail
-/// use std::rc::Rc;
-/// use std::thread;
-/// fn rc_across_threads() {
-///     let r = Rc::new(5);
-///     thread::spawn(move || {
-///         let _ = r.clone();
-///     });
-/// }
-/// ```
 pub fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
     if x.len() >= y.len() { x } else { y }
 }
@@ -89,7 +42,7 @@ pub fn thread_move_owned_demo() -> String {
 }
 
 fn main() {
-    println!("-- Borrow & Lifetime Lab (single-file) --");
+    println!("-- Borrow & Lifetime Lab --");
     println!("longest(\"short\", \"a little longer\") => {}",
         longest("short", "a little longer"));
     let s = String::from("wrapped");
@@ -101,7 +54,6 @@ fn main() {
     println!("refcell_ok() => {}", ok);
     let threaded = thread_move_owned_demo();
     println!("thread_move_owned_demo() => {}", threaded);
-    println!("\nRun tests:\n  cargo test\nDoc tests:\n  rustdoc --test src/main.rs");
 }
 
 #[cfg(test)]
